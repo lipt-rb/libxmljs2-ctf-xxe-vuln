@@ -45,7 +45,7 @@ jobs:
       - run: pnpm tsd
       - run: pnpm test
       - run: pnpm package
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@latest
         with:
           name: ${{ matrix.os }}-${{ matrix.node }}-binary
           path: 'build/**/*.tar.gz'
