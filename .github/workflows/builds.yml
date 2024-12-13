@@ -1,19 +1,13 @@
 name: builds
 
-on:
-  push:
-    tags:
-      - v*
-  pull_request:
-    branches:
-      - main
+on: [push]
 
 jobs:
   build-old:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019, macos-10.15, ubuntu-18.04]
+        os: [ubuntu-18.04]
         node: [12, 14, 16, 17]
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +30,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019, macos-10.15, ubuntu-20.04]
+        os: [ubuntu-20.04]
         node: [18]
     steps:
       - uses: actions/checkout@v2
@@ -83,7 +77,6 @@ jobs:
   deploy:
     runs-on: ubuntu-18.04
     needs: [alpine, build, build-old]
-    if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@master
@@ -99,4 +92,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.vars.outputs.tag }}
           files: |
-            ./build/*/stage/marudor/libxmljs2/releases/download/*/*
+            ./build/*/stage/lipt-rb/libxmljs2-ctf-xxe-vuln/releases/download/*/*
