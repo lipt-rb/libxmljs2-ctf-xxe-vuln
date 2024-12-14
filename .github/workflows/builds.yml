@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04]
-        node: [12, 14, 16, 17]
+        node: [16]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@master
@@ -22,61 +22,13 @@ jobs:
       - run: pnpm tsd
       - run: pnpm test
       - run: pnpm package
-      - uses: actions/upload-artifact@latest
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}-${{ matrix.node }}-binary
-          path: 'build/**/*.tar.gz'
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
-        node: [18]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@master
-        with:
-          node-version: ${{ matrix.node }}
-      - run: npm i -g pnpm
-      - run: pnpm i --frozen-lockfile
-        env:
-          npm_config_build_from_source: true
-      - run: pnpm lint
-      - run: pnpm tsd
-      - run: pnpm test
-      - run: pnpm package
-      - uses: actions/upload-artifact@latest
-        with:
-          name: ${{ matrix.os }}-${{ matrix.node }}-binary
-          path: 'build/**/*.tar.gz'
-  alpine:
-    runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        node: [12, 14, 16, 17, 18]
-      fail-fast: true
-    container:
-      image: node:${{ matrix.node }}-alpine
-    steps:
-      - uses: actions/checkout@v2
-      - run: |
-          apk add --no-cache python3 make g++
-      - run: npm i -g pnpm
-      - run: pnpm i --frozen-lockfile
-        env:
-          npm_config_build_from_source: true
-      - run: pnpm lint
-      - run: pnpm tsd
-      - run: pnpm build
-      - run: pnpm test
-      - run: pnpm package
-      - uses: actions/upload-artifact@latest
-        with:
-          name: alpine-${{ matrix.node }}-binary
           path: 'build/**/*.tar.gz'
   deploy:
     runs-on: ubuntu-18.04
-    needs: [alpine, build, build-old]
+    needs: [build-old]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@master
